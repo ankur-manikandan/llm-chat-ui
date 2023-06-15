@@ -122,25 +122,6 @@ class chatUI:
 
         return response
 
-    # def extract_text_and_code(self, text):
-    #     # Initialize the type ('text' or 'code') based on whether the text starts with code
-    #     initial_type = 'code' if text.lstrip().startswith('```') else 'text'
-
-    #     # Split the text on triple backticks
-    #     pieces = re.split(r"```", text)
-
-    #     # Remove leading/trailing whitespace from each piece
-    #     pieces = [piece.strip() for piece in pieces]
-
-    #     # Remove any empty strings from the list
-    #     pieces = [piece for piece in pieces if piece]
-
-    #     # Create list of tuples with type ('text' or 'code') based on index, starting with initial_type
-    #     typed_pieces = [(piece, 'code' if (i + (initial_type == 'code')) %
-    #                     2 else 'text') for i, piece in enumerate(pieces)]
-
-    #     return typed_pieces
-
     def save_to_file(self) -> None:
 
         combined_path = os.path.join(self.file_path, self.chat_name+'.json')
