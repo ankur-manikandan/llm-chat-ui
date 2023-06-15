@@ -17,12 +17,12 @@ gh repo clone ankur-manikandan/llm-chat-ui
 ```
 4. On your local machine change directory to `llm-chat-ui`. Example:
 ```
-$ cd ~/Documents/github/llm-chat-ui
+cd ~/Documents/github/llm-chat-ui
 ```
 5. Create a `.env` file in the `llm-chat-ui` directory. We will use this file to store the OpenAI API key. 
     * Create a `.env` file.
     ```
-    llm-chat-ui $ vi .env
+    vi .env
     ```
     * Add the API key. Please use the same environment variable name.
     ```
@@ -31,19 +31,19 @@ $ cd ~/Documents/github/llm-chat-ui
     * Save the `.env` file.
 6. You are ready to build the docker container.
 ```
-llm-chat-ui $ docker build -t container-name .
+docker build -t container-name .
 ```
 Example:
 ```
-llm-chat-ui $ docker build -t llm-ui .
+docker build -t llm-ui .
 ```
-7. Build the container.
+7. Run the container.
 ```
-llm-chat-ui $ docker build -p 8501:8501 container-name
+docker run -p 8501:8501 container-name
 ```
 Example:
 ```
-llm-chat-ui $ docker build -p 8501:8501 llm-ui
+docker run -p 8501:8501 llm-ui
 ```
 `-p` maps port `8501` of the Docker container to port `8501` on your local machine, allowing you to access the Streamlit app in your browser at `http://localhost:8501`.
 
@@ -53,7 +53,7 @@ docker run -p 8501:8501 -v /path/to/local/directory:/path/in/container container
 ```
 Example:
 ```
-llm-chat-ui $ docker run -p 8501:8501 -v ~/Documents/github/llm-chat-ui/:/app container-name
+docker run -p 8501:8501 -v ~/Documents/github/llm-chat-ui/:/app container-name
 ```
 In the above command, we are assuming that the working directory of the docker container is `/app`.
 8. Wait for the docker container to build. If you see the following message, the container has successfully been built.
