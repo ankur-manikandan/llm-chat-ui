@@ -56,7 +56,8 @@ Example:
 docker run -p 8501:8501 -v ~/Documents/github/llm-chat-ui/:/app llm-ui
 ```
 In the above command, we are assuming that the working directory of the docker container is `/app`.
-8. Wait for the docker container to build. If you see the following message, the container has successfully been built.
+
+8. Wait for the docker container to finish building. Once you see the message below, the container has been successfully built.
 ```
 You can now view your Streamlit app in your browser.
 
