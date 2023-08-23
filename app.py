@@ -4,13 +4,10 @@ Checkout the github repo: https://github.com/marshmellow77/streamlit-chatgpt-ui/
 """
 
 import os
-import re
-import json
 
 from dotenv import load_dotenv
 import openai
 import streamlit as st
-from streamlit_chat import message
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,20 +21,11 @@ GPT_4 = "GPT-4"
 
 
 class chatUI:
-
     def __init__(self) -> None:
 
-        self.initialize_session_state()
+        self.initialize_session()
 
         self.sidebar_ui()
-
-        # define json object to save the chat history
-        self.chat_history = []
-
-        # container for chat history
-        self.response_container = st.container()
-        # container for text box
-        self.container = st.container()
 
         self.model_selection()
 
@@ -45,24 +33,15 @@ class chatUI:
         if self.clear_button:
             self.reset_chat_session()
 
+        self.display_chat_history()
+
         self.create_chat_ui()
 
-        # Save chat history
-        if st.sidebar.button("Save"):
-            self.save_to_file()
+    def initialize_session(self) -> None:
 
-    # Initialize session state variables
-    def initialize_session_state(self) -> None:
-        if 'generated' not in st.session_state:
-            st.session_state['generated'] = []
-        if 'past' not in st.session_state:
-            st.session_state['past'] = []
-        if 'messages' not in st.session_state:
-            st.session_state['messages'] = [
-                {"role": "system", "content": "You are a helpful assistant."}
-            ]
-        if 'model_name' not in st.session_state:
-            st.session_state['model_name'] = []
+        # initialize chat history
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
     def sidebar_ui(self) -> None:
 
@@ -76,10 +55,6 @@ class chatUI:
         st.sidebar.markdown("---")
         self.clear_button = st.sidebar.button(
             "Clear Conversation", key="clear")
-        self.file_path = st.sidebar.text_input(
-            "File path", "", help="Enter the file path to save the chat history.")
-        self.chat_name = st.sidebar.text_input(
-            "Chat name", "", help="Enter the name of the file.")
 
     def model_selection(self) -> None:
 
@@ -92,72 +67,45 @@ class chatUI:
     # reset the chat session
     def reset_chat_session(self) -> None:
 
-        st.session_state['generated'] = []
-        st.session_state['past'] = []
-        st.session_state['messages'] = [
-            {"role": "system", "content": "You are a helpful assistant."}
-        ]
+        st.session_state.messages = []
 
-    # Call GPT
-    def generate_response(self, prompt) -> str:
+    def display_chat_history(self) -> None:
 
-        st.session_state['messages'].append(
-            {"role": "user", "content": prompt})
+        # Display chat messages from history on app rerun
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
-        msgs = [
-            {"role": "system", "content": "You are a helpful assistant."}
-        ]
-        msgs += st.session_state['messages'][-9:]
+    def create_chat_ui(self) -> None:
 
-        completion = openai.ChatCompletion.create(
-            model=self.model,
-            messages=st.session_state['messages'],
-            temperature=self.model_temp
-        )
-        response = completion.choices[0].message.content
-        st.session_state['messages'].append(
-            {"role": "assistant", "content": response})
+        # user prompt
+        if prompt := st.chat_input("Enter prompt"):
+            # Add user message to chat history
+            st.session_state.messages.append(
+                {"role": "user", "content": prompt})
+            # Display user message in chat message container
+            with st.chat_message("user"):
+                st.markdown(prompt)
 
-        # print(st.session_state['messages'])
-
-        return response
-
-    def save_to_file(self) -> None:
-
-        combined_path = os.path.join(self.file_path, self.chat_name+'.json')
-
-        # save the chat history to the user-defined directory
-        with open(combined_path, "w") as json_file:
-            json.dump(self.chat_history, json_file)
-
-        st.success("Chat history saved!")
-
-    def create_chat_ui(self, chat_container_key='new_form', user_input_key='new_input') -> None:
-
-        with self.container:
-            with st.form(key=chat_container_key, clear_on_submit=True):
-                user_input = st.text_area(
-                    "You:", key=user_input_key, height=100)
-                submit_button = st.form_submit_button(label='Send')
-
-            if submit_button and user_input:
-                output = self.generate_response(user_input)
-                st.session_state['past'].append(user_input)
-                st.session_state['generated'].append(output)
-
-        if st.session_state['generated']:
-            with self.response_container:
-                for i in range(len(st.session_state['generated'])):
-                    message(st.session_state["past"][i],
-                            is_user=True, key=str(i) + '_user')
-                    st.header(f":robot_face: \n")
-                    st.markdown(st.session_state["generated"][i])
-                    self.chat_history.append({'user': st.session_state["past"][i],
-                                              'system': st.session_state["generated"][i]
-                                              }
-                                             )
+            # Display assistant response in chat message container
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for response in openai.ChatCompletion.create(
+                    model=self.model,
+                    messages=[{"role": m["role"], "content": m["content"]}
+                              for m in st.session_state.messages],
+                    stream=True,
+                    temperature=self.model_temp
+                ):
+                    full_response += response.choices[0].delta.get(
+                        "content", "")
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+            st.session_state.messages.append(
+                {"role": "assistant", "content": full_response})
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
-    chat_ui = chatUI()
+    chatui = chatUI()
