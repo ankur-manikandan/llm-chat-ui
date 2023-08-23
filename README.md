@@ -5,7 +5,7 @@ LLMs supported:
 * GPT 3.5 
 * GPT 4
 
-The code in this repo is inspired by marshmellow77. Checkout the [github repo](https://github.com/marshmellow77/streamlit-chatgpt-ui/tree/main).
+The code in this repo is inspired by Streamlit's [Build conversational apps tutorial](https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps). 
 
 # Instructions
 
