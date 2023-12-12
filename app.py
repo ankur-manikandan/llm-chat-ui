@@ -16,8 +16,8 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # List of OpenAI models
-GPT_3_5 = "GPT-3.5"
-GPT_4 = "GPT-4"
+GPT_3_5 = "gpt-3.5-turbo-1106"
+GPT_4 = "gpt-4-1106-preview"
 
 
 class chatUI:
